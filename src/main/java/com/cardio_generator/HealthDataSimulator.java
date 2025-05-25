@@ -25,13 +25,43 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+
+/**
+ * Simulates real-time health data generation for multiple patients.
+ * The simulation includes various health metrics such as ECG readings, blood saturation,
+ * blood pressure, blood levels, and alert monitoring.
+ *
+ * <p>The simulator supports different output methods including console, file,
+ * WebSocket, and TCP socket.</p>
+ *
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * java HealthDataSimulator --patient-count 100 --output websocket:8080
+ * }</pre>
+ * <p>This command simulates data for 100 patients and streams output via WebSocket on port 8080.</p>
+ */
+
 public class HealthDataSimulator {
 
-    private static int patientCount = 50; // Default number of patients
+    /** Default number of patients to simulate. */
+    private static int patientCount = 50;
+
+    /** Manages scheduled tasks for continuous health data simulation. */
     private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
+
+    /** Defines the output strategy for generated health data. Defaults to console output. */
+    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy();
+
+    /** Random number generator for scheduling task delays. */
     private static final Random random = new Random();
 
+
+    /**
+     * Starts the health data simulation by initializing patients and scheduling data generation tasks.
+     *
+     * @param args Command-line arguments specifying patient count and output strategy.
+     * @throws IOException If an error occurs while setting up file-based output.
+     */
     public static void main(String[] args) throws IOException {
 
         parseArguments(args);
@@ -44,6 +74,16 @@ public class HealthDataSimulator {
         scheduleTasksForPatients(patientIds);
     }
 
+    /**
+ * Parses command-line arguments to configure the patient count and output strategy.
+ * <p>
+ * This method processes user-provided arguments to determine the number of patients 
+ * to simulate and the desired output format, supporting console, file, WebSocket, and TCP.
+ * </p>
+ *
+ * @param args The array of command-line arguments provided by the user.
+ * @throws IOException If an error occurs while creating file-based output directories.
+ */
     private static void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -105,6 +145,9 @@ public class HealthDataSimulator {
         }
     }
 
+    /**
+     * Displays command-line usage instructions.
+     */
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
         System.out.println("Options:");
@@ -122,6 +165,12 @@ public class HealthDataSimulator {
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
 
+    /**
+     * Initializes a list of patient IDs ranging from 1 to {@code patientCount}.
+     *
+     * @param patientCount The number of patients to simulate.
+     * @return A list of patient IDs.
+     */
     private static List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
@@ -130,6 +179,11 @@ public class HealthDataSimulator {
         return patientIds;
     }
 
+    /**
+     * Schedules health data generation tasks for all patients.
+     *
+     * @param patientIds List of patient IDs for simulation.
+     */
     private static void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
@@ -146,6 +200,13 @@ public class HealthDataSimulator {
         }
     }
 
+    /**
+     * Schedules a recurring task with a randomized initial delay.
+     *
+     * @param task The task to schedule.
+     * @param period The execution interval.
+     * @param timeUnit The unit of time for scheduling.
+     */
     private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
     }
