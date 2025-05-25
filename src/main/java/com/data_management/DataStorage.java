@@ -14,14 +14,30 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-
+    private DataReader reader;
+    //private DataReader reader;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
      */
     public DataStorage() {
         this.patientMap = new HashMap<>();
+        
     }
+
+    /**
+     * Constructor that accepts a DataReader.
+     *
+     * @param reader the DataReader used for loading patient data.
+     */
+    public DataStorage(DataReader reader) {
+        this();
+        this.reader = reader; 
+    }
+
+    
+
+    
 
     /**
      * Adds or updates patient data in the storage.
@@ -89,7 +105,7 @@ public class DataStorage {
 
         // Assuming the reader has been properly initialized and can read data into the
         // storage
-        // reader.readData(storage);
+        //reader.readData(storage);
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
